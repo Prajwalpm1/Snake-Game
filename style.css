@@ -76,6 +76,7 @@ section .infos{
 
 .board{
     flex-grow: 1;
+    touch-action: none;
     border: 1px solid var(--border-primary-color);
     border-radius: 10px;
 

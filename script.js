@@ -173,15 +173,52 @@ function restartGame(){
 }
 
 
-addEventListener('keydown',(ev)=>{
-    if(ev.key === 'ArrowDown'){
-        direction = "down"
-    }else if(ev.key === 'ArrowUp'){
-        direction = "up"
-    }else if(ev.key === 'ArrowRight'){
-        direction = "right"
-    }else if(ev.key === 'ArrowLeft'){
-        direction = "left"
+function changeDirection(newDirection){
+    // Prevent an immediate 180-degree turn into the snake's own body.
+    const oppositeDirections = {
+        left: "right",
+        right: "left",
+        up: "down",
+        down: "up"
+    };
+    if(newDirection !== oppositeDirections[direction]){
+        direction = newDirection;
     }
+}
 
-})
+addEventListener('keydown', (ev) => {
+    const keyDirections = {
+        ArrowDown: "down",
+        ArrowUp: "up",
+        ArrowRight: "right",
+        ArrowLeft: "left"
+    };
+    if(keyDirections[ev.key]){
+        ev.preventDefault();
+        changeDirection(keyDirections[ev.key]);
+    }
+});
+
+let swipeStartX = 0;
+let swipeStartY = 0;
+
+board.addEventListener('touchstart', (ev) => {
+    const touch = ev.changedTouches[0];
+    swipeStartX = touch.clientX;
+    swipeStartY = touch.clientY;
+}, { passive: true });
+
+board.addEventListener('touchend', (ev) => {
+    const touch = ev.changedTouches[0];
+    const deltaX = touch.clientX - swipeStartX;
+    const deltaY = touch.clientY - swipeStartY;
+    const minimumSwipe = 20;
+
+    if(Math.max(Math.abs(deltaX), Math.abs(deltaY)) < minimumSwipe) return;
+
+    if(Math.abs(deltaX) > Math.abs(deltaY)){
+        changeDirection(deltaX > 0 ? "right" : "left");
+    }else{
+        changeDirection(deltaY > 0 ? "down" : "up");
+    }
+}, { passive: true });
